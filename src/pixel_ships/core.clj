@@ -2,7 +2,7 @@
 
 (def n 12)
 (def pixels-per-cell 3)
-(def always-solid2 {:pixels {:solid '([5 2] [5 3] [5 4] [5 5] [5 9])}})
+(def always-solid {:pixels {:solid '([5 2] [5 3] [5 4] [5 5] [5 9])}})
 
 (def hull-cols '(4 5 4 3 4 3 4 2 3 4 1 2 3 1 2 3 1 2 3 1 2 3 4  3  4  5))
 (def hull-rows '(1 1 2 3 3 4 4 5 5 5 6 6 6 7 7 7 8 8 8 9 9 9 9 10 10 10))
@@ -15,7 +15,7 @@
 (def cockpit-count (count cockpit-cols))
 
 
-(defn add-hull2 [cells]
+(defn add-hull [cells]
   (let [seed (:seed cells)
         checker (fn [result i mask]
                    (cond (>= i hull-count) result
@@ -24,21 +24,18 @@
                          :else (recur result (inc i) (bit-shift-left mask 1))))]
     (assoc-in cells [:pixels :hull] (checker () 0 1))))
 
-(defn add-cockpit2 [cells]
+(defn add-cockpit [cells]
   (let [seed (:seed cells)
         checker (fn [solid-cells cockpit-cells i mask]
-                   (do
-                     (prn "Cockpit" cockpit-cells)
-                     (prn "Solid" solid-cells)
                    (cond (>= i cockpit-count)
                            (let [pixels (:pixels cells)]
                                  (assoc cells :pixels (merge pixels (assoc {} :cockpit cockpit-cells) (assoc {} :solid solid-cells))))
                          (not= 0 (bit-and seed mask))
                            (recur (conj solid-cells (vector (nth cockpit-cols i) (nth cockpit-rows i))) cockpit-cells (inc i) (bit-shift-left mask 1))
-                         :else (recur solid-cells (conj cockpit-cells (vector (nth cockpit-cols i) (nth cockpit-rows i))) (inc i) (bit-shift-left mask 1)))))]
+                         :else (recur solid-cells (conj cockpit-cells (vector (nth cockpit-cols i) (nth cockpit-rows i))) (inc i) (bit-shift-left mask 1))))]
     (checker ((comp :solid :pixels) cells) ((comp :cockpit :pixels) cells) 0 (bit-shift-left 1 26))))
 
-(defn wrap-with-solids2 [cells]
+(defn wrap-with-solids [cells]
   (let [hull-cells (into [] ((comp :hull :pixels) cells))
         all-cells (into [] (reduce #(concat %1 %2) (vals (:pixels cells))))
         checker (fn [result x y]
@@ -53,7 +50,7 @@
                         :else (recur result (inc x) y)))]
     (checker ((comp :solid :pixels) cells) 0 0)))
 
-(defn mirror-ship2 [cells]
+(defn mirror-ship [cells]
   (let [pixels (:pixels cells)
         mirror-list (fn [m]
                       (concat m (map (fn[[a b]] (vector (- (dec n) a) b)) m)))]
@@ -61,15 +58,16 @@
                              (assoc :cockpit (mirror-list (:cockpit pixels )))
                              (assoc :solid (mirror-list (:solid pixels )))))))
 
-(defn generate-pixel-ship2 [seed]
-  (-> (assoc always-solid2 :seed seed)
-      (add-hull2)
-      (add-cockpit2)
-      (wrap-with-solids2)
-      (mirror-ship2)
+(defn generate-pixel-ship [seed]
+  (-> (assoc always-solid :seed seed)
+      (add-hull)
+      (add-cockpit)
+      (wrap-with-solids)
+      (mirror-ship)
       ))
 
-(def ship2 (generate-pixel-ship2 Integer/MAX_VALUE))
-(count ((comp :solid :pixels) ship2))
-ship2
+(def ship (generate-pixel-ship Integer/MAX_VALUE))
+(count ((comp :solid :pixels) ship))
+ship
+
 
