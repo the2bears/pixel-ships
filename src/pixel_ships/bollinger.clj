@@ -19,7 +19,7 @@
    :bright-mid 0.5
    :bright-delta 0.12
    :bright-multipliers '[-3 -2 -1 0 1  2 3 3 2 1 0 -1 -2 -3]
-   :solid-color {:color {:h 0.0 :s 0.0 :v 0.0}}
+   :solid-color {:h 0.0 :s 0.0 :v 0.0}
    :hues-fn (fn[seed]
               (vector (/ (bit-and seed 0xff) 255.0)
                       (/ (bit-shift-right (bit-and seed 0xff00) 8) 255.0)
@@ -39,4 +39,4 @@
         s (nth saturations y)
         v (+ (nth brightnesses x) v-mod)]
     (if (= tag :solid) (:solid-color scheme)
-    {:color {:h h :s s :v v}})))
+    {:h h :s s :v v})))
