@@ -71,9 +71,9 @@ ship
 
 (defn color-pixel-ship [pixel-ship]
   (let [color-tag (fn[ship tag]
-                  (assoc-in ship [:pixels tag]
-                             (into [] (map (fn[{:keys [x y]}] {:x x :y y  :color (bollinger/color-from-coords bollinger/color-scheme (:seed bollinger/model) x y tag)})
-     ((comp tag :pixels) ship)))))]
+                    (assoc-in ship [:pixels tag]
+                              (into [] (map (fn[{:keys [x y]}] {:x x :y y  :color (bollinger/color-from-coords bollinger/color-scheme (:seed bollinger/model) x y tag)})
+                                            ((comp tag :pixels) ship)))))]
     (reduce #(color-tag %1 %2) pixel-ship (keys (:pixels pixel-ship)))))
 
 (color-pixel-ship ship)
