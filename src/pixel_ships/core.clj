@@ -59,21 +59,9 @@
       (mirror-ship)
       ))
 
-(def ship (create-pixel-ship bollinger/model))
-(count ((comp :hull :pixels) ship))
-ship
-
-(defn add-color2 [ship2 tag]
-  (assoc-in ship2 [:pixels tag] (into [] (map (fn[{:keys [x y]}] {:x x :y y  :color (bollinger/color-from-coords bollinger/color-scheme (:seed bollinger/model) x y tag)})
-     ((comp tag :pixels) ship2)))))
-
-(reduce #(add-color2 %1 %2) ship (keys (:pixels ship)))
-
 (defn color-pixel-ship [pixel-ship]
   (let [color-tag (fn[ship tag]
                     (assoc-in ship [:pixels tag]
                               (into [] (map (fn[{:keys [x y]}] {:x x :y y  :color (bollinger/color-from-coords bollinger/color-scheme (:seed pixel-ship) x y tag)})
                                             ((comp tag :pixels) ship)))))]
     (reduce #(color-tag %1 %2) pixel-ship (keys (:pixels pixel-ship)))))
-
-(color-pixel-ship ship)
