@@ -1,7 +1,7 @@
 (ns pixel-ships.core
   (:require [pixel-ships.bollinger :as bollinger]))
 
-(defn add-hull [cells]
+(defn- add-hull [cells]
   (let [seed (:seed cells)
         hull-possibles ((comp :hull :model) cells)
         hull-count (count hull-possibles)
@@ -12,7 +12,7 @@
                          :else (recur result (inc i) (bit-shift-left mask 1))))]
     (assoc-in cells [:pixels :hull] (checker [] 0 1))))
 
-(defn add-cockpit [cells]
+(defn- add-cockpit [cells]
   (let [seed (:seed cells)
         cockpit-possibles ((comp :cockpit :model) cells)
         cockpit-count (count cockpit-possibles)
@@ -25,7 +25,7 @@
                          :else (recur solid-cells (conj cockpit-cells (nth cockpit-possibles i)) (inc i) (bit-shift-left mask 1))))]
     (checker ((comp :solid :pixels) cells) ((comp :cockpit :pixels) cells) 0 (bit-shift-left 1 26))))
 
-(defn wrap-with-solids [cells]
+(defn- wrap-with-solids [cells]
   (let [hull-cells (into [] ((comp :hull :pixels) cells))
         all-cells (into [] (reduce #(concat %1 %2) (vals (:pixels cells))))
         ship-size (:ship-size cells)
@@ -41,7 +41,7 @@
                         :else (recur result (inc x) y)))]
     (checker ((comp :solid :pixels) cells) 0 0)))
 
-(defn mirror-ship [cells]
+(defn- mirror-ship [cells]
   (let [pixels (:pixels cells)
         ship-size (:ship-size cells)
         mirror-list (fn [m]
