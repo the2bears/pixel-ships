@@ -28,10 +28,11 @@
 (defn- wrap-with-solids [cells]
   (let [hull-cells (into [] ((comp :hull :pixels) cells))
         all-cells (into [] (reduce #(concat %1 %2) (vals (:pixels cells))))
-        ship-size (:ship-size cells)
+        ship-x (or (:ship-x cells) (:ship-size cells))
+        ship-y (or (:ship-y cells) (:ship-size cells))
         checker (fn [result x y]
-                  (cond (>= x (/ ship-size 2)) (recur result 0 (inc y))
-                        (>= y ship-size) (assoc-in cells [:pixels :solid] (into [] (distinct result)))
+                  (cond (>= x (/ ship-x 2)) (recur result 0 (inc y))
+                        (>= y ship-y) (assoc-in cells [:pixels :solid] (into [] (distinct result)))
                         (and (or (.contains hull-cells {:x x :y (inc y)} )
                                  (.contains hull-cells {:x x :y (dec y)} )
                                  (.contains hull-cells {:x (inc x) :y y} )
